@@ -3,12 +3,12 @@ from bs4 import BeautifulSoup
 import json
 import time
 import os
-# --- INSTÄLLNINGAR ---
-URL = ""
+
+URL = "https://marknad.studentbostader.se/widgets/?pagination=1&paginationantal=20&callback=jQuery37106019219408482263_1774893162413&widgets%5B%5D=objektfilter%40fordon&widgets%5B%5D=objektsortering&widgets%5B%5D=paginering%40fordon&widgets%5B%5D=objektlista%40fordon&widgets%5B%5D=pagineringgonew%40fordon&widgets%5B%5D=pagineringlista%40fordon&widgets%5B%5D=pagineringgoold%40fordon&_=1774893162414"
 FILENAME = "history.txt"
 
 def skicka_notis(text):
-    url = ""
+    url = "DISCORD_WEBHOOK_URL"
     requests.post(url, json={"content": text})
 
 def kolla_annonser():
@@ -26,8 +26,6 @@ def kolla_annonser():
 
     annonser = data["data"]["objektlista@fordon"]
     
-    # Här hittar vi dina rader!
-    
     
     if os.path.exists(FILENAME):
         with open(FILENAME, "r") as f:
@@ -38,18 +36,15 @@ def kolla_annonser():
     nya_hittade = False
 
     for annons in annonser:
-        # ID:t är den långa länken i data-href
         annons_id = annons["objektNr"]
         
         if annons_id not in sedda:
-            # Vi plockar ut info direkt ur nycklarna
             adress = annons["adress"]
             hyra = annons["hyra"]
             omrade = annons["omrade"]
             plats_nr = annons["tinyObjektNr"] # Eller annons["platsNr"]
             inflytt = annons["inflyttningDatum"]
             
-            # Skapa länken (vi kan fortfarande använda detaljUrl för att klicka oss fram)
             lank = "https://studentbostader.se" + annons["detaljUrl"]
 
             meddelande = (
