@@ -2,7 +2,7 @@ name: SpotFinder Bot
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # Körs var 15:e minut
+    - cron: '7/15 * * * *' # Körs var 15:e minut
   workflow_dispatch:      # Gör att du kan starta den manuellt
 
 jobs:
