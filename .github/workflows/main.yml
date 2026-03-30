@@ -1,4 +1,5 @@
 name: SpotFinder Bot
+
 on:
   schedule:
     - cron: '*/15 * * * *' # Körs var 15:e minut
@@ -8,10 +9,13 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: write    # Viktigt för att boten ska kunna spara sedda annonser
+      contents: write     # Ger roboten rätt att spara i history.txt
+    
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Hämtar hela historiken för att undvika synk-fel
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -30,12 +34,21 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Action"
-          git pull origin main --rebase
           
+          # 1. Se till att filen finns så vi inte får felmeddelanden
+          touch history.txt
+          
+          # 2. Lägg till filen i kön
           git add history.txt
           
+          # 3. Försök skapa ett "paket" (commit) av ändringarna
           if git commit -m "Uppdatera historik [skip ci]"; then
+            # 4. Om det fanns något nytt, hämta ev. ändringar från servern
+            # och lägg vår nya data "överst" (rebase)
+            git pull origin main --rebase
+            
+            # 5. Skicka upp till GitHub
             git push origin main
           else
-            echo "Inget nytt att spara idag."
+            echo "Ingen ny data att spara denna gång."
           fi
