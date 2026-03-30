@@ -1,0 +1,35 @@
+name: SpotFinder Bot
+on:
+  schedule:
+    - cron: '*/15 * * * *' # Körs var 15:e minut
+  workflow_dispatch:      # Gör att du kan starta den manuellt
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write    # Viktigt för att boten ska kunna spara sedda annonser
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Run bot
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: python bot.py
+
+      - name: Save progress
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Action"
+          git add sedda_annonser.txt || echo "Ingen fil att lägga till"
+          git commit -m "Uppdatera sedda annonser" || echo "Inget nytt att spara"
+          git push || echo "Inget att pusha"
