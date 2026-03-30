@@ -30,6 +30,12 @@ jobs:
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Action"
-          git add sedda_annonser.txt || echo "Ingen fil att lägga till"
-          git commit -m "Uppdatera sedda annonser" || echo "Inget nytt att spara"
-          git push || echo "Inget att pusha"
+          git pull origin main --rebase
+          
+          git add history.txt
+          
+          if git commit -m "Uppdatera historik [skip ci]"; then
+            git push origin main
+          else
+            echo "Inget nytt att spara idag."
+          fi
